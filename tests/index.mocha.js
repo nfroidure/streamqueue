@@ -35,6 +35,30 @@ describe('StreamQueue', function() {
       queue.done();
     });
 
+    it('should reemit errors', function(done) {
+      var erroredStream = new Stream.PassThrough();
+      var gotError = false;
+      var queue = new StreamQueue();
+      queue.queue(erroredStream);
+      queue.queue(writeToStream(new Stream.PassThrough(), ['wa','dup']));
+      queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
+      queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
+      queue.on('error', function(err) {
+        gotError = true;
+      });
+      queue.pipe(es.wait(function(err, data) {
+        assert(gotError);
+        assert.equal(err, null);
+        assert.equal(data, 'wadupplopkikoolol');
+        done();
+      }));
+      queue.done();
+      process.nextTick(function() {
+        erroredStream.emit('error', new Error('Aouch !'));
+        erroredStream.end();
+      });
+    });
+
   });
 
   describe('in object mode', function() {

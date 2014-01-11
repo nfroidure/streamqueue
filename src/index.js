@@ -23,7 +23,14 @@ function StreamQueue(options) {
 
 // Queue each stream given in argument
 StreamQueue.prototype.queue = function() {
-  var streams = [].slice.call(arguments);
+  var streams = [].slice.call(arguments)
+    , _self = this;
+  
+  streams.forEach(function(stream) {
+    stream.on('error', function(err) {
+      _self.emit('error', err);
+    });
+  });
 
   if(this._ending) {
     throw new Error('Cannot add more streams to the queue.');
