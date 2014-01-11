@@ -5,18 +5,18 @@
   "homepage": "https://github.com/nfroidure/StreamQueue",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha tests/*.mocha.js"
+    "test": "node_modules/mocha/bin/mocha tests/*.mocha.js"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/nfroidure/StreamQueue"
   },
   "keywords": [
-    "buffer",
+    "queue",
     "streaming",
     "stream",
     "async",
-    "abstract"
+    "pipe"
   ],
 	"devDependencies": {
 		"mocha": "1.x.x",

@@ -34,6 +34,8 @@ new StreamQueue()
   .pipe(process.stdout);
 ```
 
+You can queue new streams at any moment until you call the end() method.
+
 ## Contributing
 Feel free to pull your code if you agree with publishing it under the MIT license.
 
