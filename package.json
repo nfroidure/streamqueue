@@ -1,0 +1,41 @@
+{
+  "name": "streamqueue",
+  "version": "0.0.1",
+  "description": "Pipe queued streams progressively.",
+  "homepage": "https://github.com/nfroidure/StreamQueue",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha tests/*.mocha.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nfroidure/StreamQueue"
+  },
+  "keywords": [
+    "buffer",
+    "streaming",
+    "stream",
+    "async",
+    "abstract"
+  ],
+	"devDependencies": {
+		"mocha": "1.x.x",
+		"event-stream": "1.x.x"
+	},
+  "author": {
+    "name": "Nicolas Froidure",
+    "url": "http://www.insertafter.com/blog.html"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/nfroidure/StreamQueue/blob/master/LICENSE"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/nfroidure/StreamQueue/issues"
+  }
+}
