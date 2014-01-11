@@ -5,15 +5,16 @@ var assert = require('assert')
 ;
 
 // Helpers
-function writeToStream(stream, strings) {
-  if(1 === arguments.length) {
+function writeToStream(stream, chunks) {
+  if(!chunks.length) {
     stream.end();
   } else {
-    stream.write(strings.shift());
+    stream.write(chunks.shift());
+    setTimeout(function() {
+      writeToStream(stream, chunks);
+    }, Math.random()*300);
   }
-  setTimeout(function() {
-    writeToStream(stream, strings);
-  }, Math.random()*1000);
+  return stream;
 }
 
 // Tests
@@ -21,34 +22,36 @@ describe('StreamQueue', function() {
 
   describe('in binary mode', function() {
 
-    it('should work', function() {
+    it('should work', function(done) {
       var queue = new StreamQueue();
-      queue.queue(new Stream.PassThrough(), ['wa','dup']);
-      queue.queue(new Stream.PassThrough(), ['pl','op']);
-      queue.queue(new Stream.PassThrough(), ['ki','koo','lol']);
+      queue.queue(writeToStream(new Stream.PassThrough(), ['wa','dup']));
+      queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
+      queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
       queue.pipe(es.wait(function(err, data) {
         assert.equal(err, null);
         assert.equal(data, 'wadupplopkikoolol');
         done();
       }));
-      queue.end();
+      queue.done();
     });
 
   });
 
   describe('in object mode', function() {
 
-    it('should work with no args', function() {
-      var queue = new StreamQueue();
-      queue.queue(new Stream.PassThrough(), [{s:'wa'},{s:'dup'}]);
-      queue.queue(new Stream.PassThrough(), [{s:'pl'},{s:'op'}]);
-      queue.queue(new Stream.PassThrough(), [{s:'ki'},{s:'koo'},{s:'lol'}]);
+    var objs = [];
+    it('should work', function(done) {
+      var queue = new StreamQueue({objectMode: true});
+      queue.queue(writeToStream(new Stream.PassThrough({objectMode: true}), [{s:'wa'},{s:'dup'}]));
+      queue.queue(writeToStream(new Stream.PassThrough({objectMode: true}), [{s:'pl'},{s:'op'}]));
+      queue.queue(writeToStream(new Stream.PassThrough({objectMode: true}), [{s:'ki'},{s:'koo'},{s:'lol'}]));
+      queue.on('data', objs.push.bind(objs));
       queue.pipe(es.wait(function(err, data) {
         assert.equal(err, null);
-        assert.deepEqual(data, [{s:'wa'},{s:'dup'},{s:'pl'},{s:'op'},{s:'ki'},{s:'koo'},{s:'lol'}]);
+        assert.deepEqual(objs, [{s:'wa'},{s:'dup'},{s:'pl'},{s:'op'},{s:'ki'},{s:'koo'},{s:'lol'}]);
         done();
       }));
-      queue.end();
+      queue.done();
     });
 
   });

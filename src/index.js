@@ -23,7 +23,11 @@ function StreamQueue(options) {
 
 // Queue each stream given in argument
 StreamQueue.prototype.queue = function() {
-  var streams = [].slice.call(arguments,0);
+  var streams = [].slice.call(arguments);
+
+  if(this._ending) {
+    throw new Error('Cannot add more streams to the queue.');
+  }
 
   this._streams = this._streams.length ? this._streams.concat(streams) : streams;
 
@@ -40,7 +44,7 @@ StreamQueue.prototype.queue = function() {
 StreamQueue.prototype._pipeNextStream = function() {
   if(!this._streams.length) {
     if(this._ending) {
-        Stream.PassThrough.prototype.end.call(this);
+      this.emit('end');
     } else {
       this._running = false;
     }
@@ -52,10 +56,13 @@ StreamQueue.prototype._pipeNextStream = function() {
 };
 
 // Queue each stream given in argument
-StreamQueue.prototype.end = function() {
+StreamQueue.prototype.done = function() {
+  if(this._ending) {
+    throw new Error('The queue is already ending.');
+  }
   this._ending = true;
   if(!this._running) {
-    Stream.PassThrough.prototype.end.call(this);
+    this.emit('end');
   }
   return this;
 }

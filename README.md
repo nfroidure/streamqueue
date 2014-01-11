@@ -18,7 +18,7 @@ queue.queue(
   Fs.createReadStream('input2.txt'),
   Fs.createReadStream('input3.txt')
 );
-queue.end();
+queue.done();
 
 queue.pipe(process.stdout);
 ```
@@ -30,11 +30,12 @@ new StreamQueue()
   .queue(Fs.createReadStream('input.txt'))
   .queue(Fs.createReadStream('input2.txt'))
   .queue(Fs.createReadStream('input3.txt'))
-  .end()
+  .done()
   .pipe(process.stdout);
 ```
 
-You can queue new streams at any moment until you call the end() method.
+You can queue new streams at any moment until you call the done() method. So the
+ created stream will not fire the end event until done() call.
 
 ## Contributing
 Feel free to pull your code if you agree with publishing it under the MIT license.
