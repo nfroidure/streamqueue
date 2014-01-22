@@ -9,7 +9,7 @@ function StreamQueue(options) {
 
   // Ensure new were used
   if (!(this instanceof StreamQueue)) {
-    throw Error('Please use the "new" operator to instanciate a StreamQueue.');
+    return new StreamQueue(options);
   }
 
   // Parent constructor
@@ -25,7 +25,7 @@ function StreamQueue(options) {
 StreamQueue.prototype.queue = function() {
   var streams = [].slice.call(arguments)
     , _self = this;
-  
+
   streams.forEach(function(stream) {
     stream.on('error', function(err) {
       _self.emit('error', err);
@@ -74,7 +74,7 @@ StreamQueue.prototype.done = function() {
   return this;
 }
 
-// Length 
+// Length
 Object.defineProperty(StreamQueue.prototype, 'length', {
   get: function() {
     return this._streams.length;
