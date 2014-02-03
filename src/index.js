@@ -7,6 +7,8 @@ util.inherits(StreamQueue, Stream.PassThrough);
 // Constructor
 function StreamQueue(options) {
 
+  options = options || {};
+
   // Ensure new were used
   if (!(this instanceof StreamQueue)) {
     return new (StreamQueue.bind.apply(StreamQueue,
@@ -28,6 +30,7 @@ function StreamQueue(options) {
   this._streams = [];
   this._running = false;
   this._ending = false;
+  this._objectMode = options.objectMode || false;
 
   // Queue given streams and ends
   if(arguments.length > 1 || options instanceof Stream) {
@@ -42,13 +45,15 @@ StreamQueue.prototype.queue = function() {
   var streams = [].slice.call(arguments, 0)
     , _self = this;
 
-  streams.forEach(function(stream) {
-    if(this._pause) {
-      stream.pause();
-    }
+  streams = streams.map(function(stream) {
     stream.on('error', function(err) {
       _self.emit('error', err);
     });
+    if(_self._pause) {
+      stream.pause();
+      stream = stream.pipe(new Stream.PassThrough({objectMode: _self._objectMode}))
+    }
+    return stream;
   });
 
   if(this._ending) {
@@ -77,7 +82,7 @@ StreamQueue.prototype._pipeNextStream = function() {
     return;
   }
   var stream = this._streams.shift();
-  stream.on('end', this._pipeNextStream.bind(this));
+  stream.once('end', this._pipeNextStream.bind(this));
   stream.pipe(this, {end: false});
 };
 

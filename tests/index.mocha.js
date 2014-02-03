@@ -20,9 +20,7 @@ function writeToStream(stream, chunks) {
   } else {
     setTimeout(function() {
       stream.write(chunks.shift());
-      setTimeout(function() {
-        writeToStream(stream, chunks);
-      }, Math.random()*300);
+      writeToStream(stream, chunks);
     }, Math.random()*100);
   }
   return stream;
@@ -48,15 +46,22 @@ describe('StreamQueue', function() {
       });
 
       it('should work with functionnal API and options', function(done) {
+        var stream1 = new Stream.PassThrough()
+          , stream2 = new Stream.PassThrough()
+          , stream3 = new Stream.PassThrough()
+        ;
         StreamQueue({pause: true},
-          writeToStream(new Stream.PassThrough(), ['wa','dup']),
-          writeToStream(new Stream.PassThrough(), ['pl','op']),
-          writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
+          writeToStream(stream1, ['wa','dup']),
+          writeToStream(stream2, ['pl','op']),
+          writeToStream(stream3, ['ki','koo','lol'])
         ).pipe(es.wait(function(err, data) {
           assert.equal(err, null);
           assert.equal(data, 'wadupplopkikoolol');
           done();
         }));
+        stream1.resume();
+        stream2.resume();
+        stream3.resume();
       });
 
       it('should work with POO API', function(done) {
@@ -73,16 +78,23 @@ describe('StreamQueue', function() {
       });
 
       it('should work with POO API and options', function(done) {
-        var queue = new StreamQueue({pause: true});
-        queue.queue(writeToStream(new Stream.PassThrough(), ['wa','dup']));
-        queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
-        queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
+        var queue = new StreamQueue({pause: true})
+          , stream1 = new Stream.PassThrough()
+          , stream2 = new Stream.PassThrough()
+          , stream3 = new Stream.PassThrough()
+        ;
+        queue.queue(writeToStream(stream1, ['wa','dup']));
+        queue.queue(writeToStream(stream2, ['pl','op']));
+        queue.queue(writeToStream(stream3, ['ki','koo','lol']));
         queue.pipe(es.wait(function(err, data) {
           assert.equal(err, null);
           assert.equal(data, 'wadupplopkikoolol');
           done();
         }));
         queue.done();
+        stream1.resume();
+        stream2.resume();
+        stream3.resume();
       });
 
       it('should reemit errors', function(done) {
