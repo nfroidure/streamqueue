@@ -56,7 +56,8 @@ StreamQueue.prototype.queue = function() {
       _self.emit('error', err);
     });
     if('undefined' == typeof stream._readableState) {
-      stream = new Stream.Readable().wrap(stream);
+      stream = (new Stream.Readable({objectMode: _self._objectMode}))
+        .wrap(stream);
     }
     if(this._pauseFlowingStream&&stream._readableState.flowing) {
       stream.pause();
