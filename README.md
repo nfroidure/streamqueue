@@ -48,15 +48,34 @@ new StreamQueue()
 You can queue new streams at any moment until you call the done() method. So the
  created stream will not fire the end event until done() call.
 
+## Streams 2 only
+Note that stream queue is only compatible with the Node 0.10+ streams. For older
+ streams, you will have to wrap them with
+ [`Readable.wrap`](http://nodejs.org/api/stream.html#stream_readable_wrap_stream)
+ before queueing them.
+
 ## API
 
 ### StreamQueue([options], [stream1, stream2, ... streamN])
 
-#### options.pause
+#### options.objectMode
 Type: `Boolean`
 Default value: `false`
 
-Pause each stream before queueing.
+Use if piped in streams are in object mode. In this case, the stream queue will
+ also be in the object mode.
+
+#### options.pauseFlowingStream
+Type: `Boolean`
+Default value: `true`
+
+If a stream is in flowing mode, then it will be paused before queueing.
+
+#### options.resumeFlowingStream
+Type: `Boolean`
+Default value: `true`
+
+If a stream is in flowing mode, then it will be resumed before piping.
 
 #### options.*
 
@@ -75,12 +94,6 @@ Append streams given in argument to the queue.
 ### StreamQueue.done([stream1, stream2, ... streamN])
 
 Append streams given in argument to the queue and ends when the queue is empty.
-
-#### options.pause
-Type: `Boolean`
-Default value: `false`
-
-Pause each queued streams.
 
 
 ## Contributing

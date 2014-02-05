@@ -15,12 +15,18 @@ function StreamQueue(options) {
       [StreamQueue].concat([].slice.call(arguments,0))));
   }
 
-  // Pause option
-  this._pause = false;
-  if(options && (!(options instanceof Stream))
-    && 'boolean' == typeof options.pause) {
-    this._pause = options.pause;
-    delete options.pause;
+  // Options
+  this._pauseFlowingStream = true;
+  this._resumeFlowingStream = true;
+  if(!(options instanceof Stream)) {
+    if('boolean' == typeof options.pauseFlowingStream) {
+      this._pauseFlowingStream = options.pauseFlowingStream;
+      delete options.pauseFlowingStream;
+    }
+    if('boolean' == typeof options.resumeFlowingStream) {
+      this._resumeFlowingStream = options.resumeFlowingStream;
+      delete options.resumeFlowingStream;
+    }
   }
 
   // Parent constructor
@@ -49,9 +55,8 @@ StreamQueue.prototype.queue = function() {
     stream.on('error', function(err) {
       _self.emit('error', err);
     });
-    if(_self._pause) {
+    if(this._pauseFlowingStream&&stream._readableState.flowing) {
       stream.pause();
-      stream = stream.pipe(new Stream.PassThrough({objectMode: _self._objectMode}))
     }
     return stream;
   });
@@ -82,6 +87,9 @@ StreamQueue.prototype._pipeNextStream = function() {
     return;
   }
   var stream = this._streams.shift();
+  if(stream._readableState.flowing) {
+    stream.resume();
+  }
   stream.once('end', this._pipeNextStream.bind(this));
   stream.pipe(this, {end: false});
 };

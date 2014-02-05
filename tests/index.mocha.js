@@ -59,9 +59,6 @@ describe('StreamQueue', function() {
           assert.equal(data, 'wadupplopkikoolol');
           done();
         }));
-        stream1.resume();
-        stream2.resume();
-        stream3.resume();
       });
 
       it('should work with POO API', function(done) {
@@ -92,9 +89,6 @@ describe('StreamQueue', function() {
           done();
         }));
         queue.done();
-        stream1.resume();
-        stream2.resume();
-        stream3.resume();
       });
 
       it('should reemit errors', function(done) {
