@@ -55,6 +55,9 @@ StreamQueue.prototype.queue = function() {
     stream.on('error', function(err) {
       _self.emit('error', err);
     });
+    if('undefined' == typeof stream._readableState) {
+      stream = new Stream.Readable().wrap(stream);
+    }
     if(this._pauseFlowingStream&&stream._readableState.flowing) {
       stream.pause();
     }
@@ -87,7 +90,7 @@ StreamQueue.prototype._pipeNextStream = function() {
     return;
   }
   var stream = this._streams.shift();
-  if(stream._readableState.flowing) {
+  if(this._resumeFlowingStream&&stream._readableState.flowing) {
     stream.resume();
   }
   stream.once('end', this._pipeNextStream.bind(this));

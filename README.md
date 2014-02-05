@@ -48,11 +48,10 @@ new StreamQueue()
 You can queue new streams at any moment until you call the done() method. So the
  created stream will not fire the end event until done() call.
 
-## Streams 2 only
-Note that stream queue is only compatible with the Node 0.10+ streams. For older
- streams, you will have to wrap them with
+Note that stream queue is compatible with the Node 0.10+ streams. For older
+ streams, stream queue will wrap them with
  [`Readable.wrap`](http://nodejs.org/api/stream.html#stream_readable_wrap_stream)
- before queueing them.
+ before queueing.
 
 ## API
 
