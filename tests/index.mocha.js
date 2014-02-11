@@ -149,6 +149,7 @@ describe('StreamQueue', function() {
       });
 
       it('should reemit errors', function(done) {
+        this.timeout(5000); // Try to fix node 0.11
         var erroredStream = new Stream.PassThrough();
         var gotError = false;
         var queue = new StreamQueue();
@@ -238,6 +239,7 @@ describe('StreamQueue', function() {
       });
 
       it('should reemit errors', function(done) {
+        this.timeout(5000); // Try to fix node 0.11
         var erroredStream = new Stream.PassThrough();
         var gotError = false;
         var queue = new StreamQueue();
