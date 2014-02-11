@@ -51,6 +51,10 @@ StreamQueue.prototype.queue = function() {
   var streams = [].slice.call(arguments, 0)
     , _self = this;
 
+  if(this._ending) {
+    throw new Error('Cannot add more streams to the queue.');
+  }
+
   streams = streams.map(function(stream) {
     stream.on('error', function(err) {
       _self.emit('error', err);
@@ -64,10 +68,6 @@ StreamQueue.prototype.queue = function() {
     }
     return stream;
   });
-
-  if(this._ending) {
-    throw new Error('Cannot add more streams to the queue.');
-  }
 
   this._streams = this._streams.length ? this._streams.concat(streams) : streams;
 
@@ -116,7 +116,7 @@ StreamQueue.prototype.done = function() {
 // Length
 Object.defineProperty(StreamQueue.prototype, 'length', {
   get: function() {
-    return this._streams.length;
+    return this._streams.length + (this._running ? 1 : 0);
   }
 });
 
