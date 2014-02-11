@@ -1,4 +1,4 @@
-# StreamQueue [![NPM version](https://badge.fury.io/js/streamqueue.png)](https://npmjs.org/package/streamqueue) [![Build Status](https://travis-ci.org/nfroidure/StreamQueue.png?branch=master)](https://travis-ci.org/nfroidure/StreamQueue)
+# StreamQueue [![NPM version](https://badge.fury.io/js/streamqueue.png)](https://npmjs.org/package/streamqueue) [![Build Status](https://travis-ci.org/nfroidure/StreamQueue.png?branch=master)](https://travis-ci.org/nfroidure/StreamQueue) [![Dependency Status](https://david-dm.org/nfroidure/streamqueue.png)](https://david-dm.org/nfroidure/streamqueue) [![devDependency Status](https://david-dm.org/nfroidure/streamqueue/dev-status.png)](https://david-dm.org/nfroidure/streamqueue#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/nfroidure/StreamQueue/badge.png?branch=master)](https://coveralls.io/r/nfroidure/StreamQueue?branch=master)
 
 StreamQueue pipe the queued streams one by one in order to preserve their content
  order.

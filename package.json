@@ -5,7 +5,8 @@
   "homepage": "https://github.com/nfroidure/StreamQueue",
   "main": "src/index.js",
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha tests/*.mocha.js"
+    "test": "node_modules/mocha/bin/mocha tests/*.mocha.js",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- tests/*.mocha.js -R spec -t 5000 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "repository": {
     "type": "git",
@@ -18,10 +19,13 @@
     "async",
     "pipe"
   ],
-	"devDependencies": {
-		"mocha": "1.x.x",
-		"event-stream": "1.x.x"
-	},
+  "devDependencies": {
+    "mocha": "~1.17.1",
+    "event-stream": "~3.1.0",
+    "mocha-lcov-reporter": "0.0.1",
+    "istanbul": "~0.2.4",
+    "coveralls": "~2.7.1"
+  },
   "author": {
     "name": "Nicolas Froidure",
     "url": "http://www.insertafter.com/blog.html"
