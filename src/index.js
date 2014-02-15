@@ -18,7 +18,7 @@ function StreamQueue(options) {
   // Options
   this._pauseFlowingStream = true;
   this._resumeFlowingStream = true;
-  if(!(options instanceof Stream)) {
+  if(!(options instanceof Stream || 'function' === typeof options)) {
     if('boolean' == typeof options.pauseFlowingStream) {
       this._pauseFlowingStream = options.pauseFlowingStream;
       delete options.pauseFlowingStream;
@@ -30,7 +30,11 @@ function StreamQueue(options) {
   }
 
   // Parent constructor
-  Stream.PassThrough.call(this, options instanceof Stream ? undefined : options);
+  Stream.PassThrough.call(this,
+    options instanceof Stream  || 'function' === typeof options
+      ? undefined
+      : options
+  );
 
   // Prepare streams queue
   this._streams = [];
@@ -39,9 +43,11 @@ function StreamQueue(options) {
   this._objectMode = options.objectMode || false;
 
   // Queue given streams and ends
-  if(arguments.length > 1 || options instanceof Stream) {
+  if(arguments.length > 1 || options instanceof Stream
+    || 'function' === typeof options) {
     this.done.apply(this,
-      [].slice.call(arguments, options instanceof Stream ? 0 : 1));
+      [].slice.call(arguments,
+        options instanceof Stream || 'function' === typeof options ? 0 : 1));
   }
 
 }
@@ -56,17 +62,25 @@ StreamQueue.prototype.queue = function() {
   }
 
   streams = streams.map(function(stream) {
-    stream.on('error', function(err) {
-      _self.emit('error', err);
-    });
-    if('undefined' == typeof stream._readableState) {
-      stream = (new Stream.Readable({objectMode: _self._objectMode}))
-        .wrap(stream);
+    function wrapper(stream) {
+      stream.on('error', function(err) {
+        _self.emit('error', err);
+      });
+      if('undefined' == typeof stream._readableState) {
+        stream = (new Stream.Readable({objectMode: _self._objectMode}))
+          .wrap(stream);
+      }
+      if(this._pauseFlowingStream&&stream._readableState.flowing) {
+        stream.pause();
+      }
+      return stream;
     }
-    if(this._pauseFlowingStream&&stream._readableState.flowing) {
-      stream.pause();
+    if('function' === typeof stream) {
+      return function() {
+        return wrapper(stream());
+      };
     }
-    return stream;
+    return wrapper(stream);
   });
 
   this._streams = this._streams.length ? this._streams.concat(streams) : streams;
@@ -91,6 +105,9 @@ StreamQueue.prototype._pipeNextStream = function() {
     return;
   }
   var stream = this._streams.shift();
+  if('function' === typeof stream) {
+    stream = stream();
+  }
   if(this._resumeFlowingStream&&stream._readableState.flowing) {
     stream.resume();
   }

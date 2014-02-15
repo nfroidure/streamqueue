@@ -19,6 +19,17 @@ var queue = streamqueue(
   Fs.createReadStream('input3.txt')
 ).pipe(process.stdout);
 ```
+StreamQueue also accept functions returning streams, the above can be written
+ like this, doing system calls only when piping:
+```js
+var streamqueue = require('streamqueue');
+
+var queue = streamqueue(
+  Fs.createReadStream.bind(null, 'input.txt'),
+  Fs.createReadStream.bind(null, 'input2.txt'),
+  Fs.createReadStream.bind(null, 'input3.txt')
+).pipe(process.stdout);
+```
 
 Object-oriented traditionnal API offers more flexibility:
 ```js
