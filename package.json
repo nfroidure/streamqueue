@@ -1,11 +1,11 @@
 {
   "name": "streamqueue",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Pipe queued streams progressively.",
   "homepage": "https://github.com/nfroidure/StreamQueue",
   "main": "src/index.js",
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha tests/*.mocha.js",
+    "test": "./node_modules/mocha/bin/mocha tests/*.mocha.js",
     "coveralls": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- tests/*.mocha.js -R spec -t 5000 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "cover": "./node_modules/istanbul/lib/cli.js cover --report html ./node_modules/mocha/bin/_mocha -- tests/*.mocha.js -R spec -t 5000"
   },
@@ -42,5 +42,8 @@
   ],
   "bugs": {
     "url": "https://github.com/nfroidure/StreamQueue/issues"
+  },
+  "dependencies": {
+    "readable-stream": "^1.0.26-2"
   }
 }

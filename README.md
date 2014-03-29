@@ -69,26 +69,28 @@ Note that stream queue is compatible with the Node 0.10+ streams. For older
 
 ### StreamQueue([options], [stream1, stream2, ... streamN])
 
-#### options.objectMode
+#### options
+
+##### options.objectMode
 Type: `Boolean`
 Default value: `false`
 
 Use if piped in streams are in object mode. In this case, the stream queue will
  also be in the object mode.
 
-#### options.pauseFlowingStream
+##### options.pauseFlowingStream
 Type: `Boolean`
 Default value: `true`
 
 If a stream is in flowing mode, then it will be paused before queueing.
 
-#### options.resumeFlowingStream
+##### options.resumeFlowingStream
 Type: `Boolean`
 Default value: `true`
 
 If a stream is in flowing mode, then it will be resumed before piping.
 
-#### options.*
+##### options.*
 
 StreamQueue inherits of Stream.PassThrough, the options are passed to the
  parent constructor so you can use it's options too.

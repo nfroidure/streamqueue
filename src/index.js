@@ -1,7 +1,31 @@
-var Stream = require('stream');
-var util = require('util');
+// Need to keep a ref to platform stream constructors since readable-stream
+// doens't inherit of them'
+// See: https://github.com/isaacs/readable-stream/pull/87
+var PlatformStream = require('stream')
+  , Stream = require('readable-stream')
+  , util = require('util')
+;
 
-// Inherit of Readable stream
+// Helper to test instances
+function streamInstanceOf(stream) {
+  var args = [].slice(arguments, 1)
+    , curConstructor;
+  if(!(stream instanceof Stream || stream instanceof PlatformStream)) {
+    return false;
+  }
+  while(args.length) {
+    curConstructor = arg.pop();
+    if(!(stream instanceof Stream[curConstructor]
+      || 'undefined' === PlatformStream[curConstructor]
+      || stream instanceof PlatformStream[curConstructor]
+    )) {
+      return false;
+    }
+  }
+  return true; // Defaults to true since checking isn't possible with 0.8
+}
+
+// Inherit of PassThrough stream
 util.inherits(StreamQueue, Stream.PassThrough);
 
 // Constructor
@@ -18,7 +42,7 @@ function StreamQueue(options) {
   // Options
   this._pauseFlowingStream = true;
   this._resumeFlowingStream = true;
-  if(!(options instanceof Stream || 'function' === typeof options)) {
+  if(!(streamInstanceOf(options) || 'function' === typeof options)) {
     if('boolean' == typeof options.pauseFlowingStream) {
       this._pauseFlowingStream = options.pauseFlowingStream;
       delete options.pauseFlowingStream;
@@ -31,7 +55,7 @@ function StreamQueue(options) {
 
   // Parent constructor
   Stream.PassThrough.call(this,
-    options instanceof Stream  || 'function' === typeof options
+    streamInstanceOf(options)  || 'function' === typeof options
       ? undefined
       : options
   );
@@ -43,11 +67,11 @@ function StreamQueue(options) {
   this._objectMode = options.objectMode || false;
 
   // Queue given streams and ends
-  if(arguments.length > 1 || options instanceof Stream
+  if(arguments.length > 1 || streamInstanceOf(options)
     || 'function' === typeof options) {
     this.done.apply(this,
       [].slice.call(arguments,
-        options instanceof Stream || 'function' === typeof options ? 0 : 1));
+        streamInstanceOf(options) || 'function' === typeof options ? 0 : 1));
   }
 
 }

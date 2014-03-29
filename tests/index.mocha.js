@@ -1,8 +1,13 @@
 var assert = require('assert')
   , es = require('event-stream')
   , StreamQueue = require('../src')
-  , Stream = require('stream')
+  , PlatformStream = require('stream')
+  , Stream = require('readable-stream')
 ;
+
+// Test each type of stream
+[PlatformStream, Stream].slice(PlatformStream.Readable ? 0 : 1)
+  .forEach(function(Stream) {
 
 // Helpers
 function writeToStreamSync(stream, chunks) {
@@ -423,5 +428,7 @@ describe('StreamQueue', function() {
     });
 
   });
+
+});
 
 });
