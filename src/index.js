@@ -135,7 +135,10 @@ StreamQueue.prototype._pipeNextStream = function() {
   if(this._resumeFlowingStream&&stream._readableState.flowing) {
     stream.resume();
   }
-  stream.once('end', this._pipeNextStream.bind(this));
+  stream.once('end', function() {
+    this.unpipe(stream);
+    this._pipeNextStream();
+  }.bind(this));
   stream.pipe(this, {end: false});
 };
 
