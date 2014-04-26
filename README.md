@@ -110,8 +110,8 @@ Append streams given in argument to the queue and ends when the queue is empty.
 
 ## Stats
 
-[![NPM](https://nodei.co/npm/streamqueue.png?downloads=true&stars=true)](https://nodei.co/npm/gulp-iconfont/)
-[![NPM](https://nodei.co/npm-dl/streamqueue.png)](https://nodei.co/npm/gulp-iconfont/)
+[![NPM](https://nodei.co/npm/streamqueue.png?downloads=true&stars=true)](https://nodei.co/npm/streamqueue/)
+[![NPM](https://nodei.co/npm-dl/streamqueue.png)](https://nodei.co/npm/streamqueue/)
 
 
 ## Contributing
