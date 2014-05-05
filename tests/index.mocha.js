@@ -408,6 +408,14 @@ describe('StreamQueue', function() {
 
     });
 
+    it('passes through "end" events', function(done) {
+      var parent = new StreamQueue();
+      var child = new StreamQueue();
+      child.done();
+      parent.queue(child);
+      parent.on('end', done);
+    });
+
   });
 
   describe('in object mode', function() {
