@@ -1,6 +1,6 @@
 {
   "name": "streamqueue",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Pipe queued streams progressively, keeping datas order.",
   "homepage": "https://github.com/nfroidure/StreamQueue",
   "main": "src/index.js",
