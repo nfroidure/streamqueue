@@ -1,8 +1,4 @@
-// Need to keep a ref to platform stream constructors since readable-stream
-// doens't inherit of them'
-// See: https://github.com/isaacs/readable-stream/pull/87
-var PlatformStream = require('stream')
-  , Stream = require('readable-stream')
+var Stream = require('readable-stream')
   , isStream = require('isstream')
   , util = require('util')
 ;
