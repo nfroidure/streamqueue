@@ -221,6 +221,50 @@ describe('StreamQueue', function() {
         }, 100);
       });
 
+      it('should fire end asynchronously with streams', function(done) {
+        var queue = new StreamQueue();
+        var ended = false;
+        queue.queue(writeToStream(new Stream.PassThrough(), ['wa','dup'])
+          .on('end', function() {
+            assert.equal(ended, false);
+          }));
+        queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op'])
+          .on('end', function() {
+            assert.equal(ended, false);
+          }));
+        queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
+          .on('end', function() {
+            assert.equal(ended, false);
+          }));
+        assert.equal(queue.length, 3);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, 'wadupplopkikoolol');
+          done();
+        }));
+        queue.on('end', function() {
+          ended = true;
+        });
+        queue.done();
+        assert.equal(ended, false);
+      });
+
+      it('should fire end asynchronously when empty', function(done) {
+        var queue = new StreamQueue();
+        var ended = false;
+        assert.equal(queue.length, 0);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        queue.on('end', function() {
+          ended = true;
+        });
+        queue.done();
+        assert.equal(ended, false);
+      });
+
       it('should work with POO API and a streamqueue ended stream plus sync done', function(done) {
         var queue = new StreamQueue();
         var child = new StreamQueue();

@@ -122,7 +122,9 @@ StreamQueue.prototype._pipeNextStream = function() {
   var stream;
   if(!this._streams.length) {
     if(this._ending) {
-      this.end();
+      process.nextTick(function() {
+        this.end();
+      }.bind(this));
     } else {
       this._running = false;
     }
@@ -153,7 +155,9 @@ StreamQueue.prototype.done = function() {
   }
   this._ending = true;
   if(!this._running) {
-    this.end();
+    process.nextTick(function() {
+      this.end();
+    }.bind(this));
   }
   return this;
 }
