@@ -23,7 +23,7 @@ function writeToStream(stream, chunks) {
   if(!chunks.length) {
     stream.end();
   } else {
-    setImmediate(function() {
+    setTimeout(function() {
       stream.write(chunks.shift());
       writeToStream(stream, chunks);
     });
@@ -34,7 +34,7 @@ function readableStream(chunks) {
   var stream = new Stream.Readable();
   stream._read = function() {
     if(chunks.length) {
-      setImmediate(function() {
+      setTimeout(function() {
         stream.push(chunks.shift());
         if(!chunks.length) {
           stream.push(null);
@@ -47,7 +47,7 @@ function readableStream(chunks) {
 }
 function erroredStream(msg) {
   var erroredStream = new Stream.PassThrough();
-  setImmediate(function() {
+  setTimeout(function() {
     erroredStream.emit('error', new Error(msg));
     erroredStream.end();
   });
