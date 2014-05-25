@@ -3,27 +3,9 @@
 // See: https://github.com/isaacs/readable-stream/pull/87
 var PlatformStream = require('stream')
   , Stream = require('readable-stream')
+  , isStream = require('isstream')
   , util = require('util')
 ;
-
-// Helper to test instances
-function streamInstanceOf(stream) {
-  var args = [].slice(arguments, 1)
-    , curConstructor;
-  if(!(stream instanceof Stream || stream instanceof PlatformStream)) {
-    return false;
-  }
-  while(args.length) {
-    curConstructor = arg.pop();
-    if(!(stream instanceof Stream[curConstructor]
-      || 'undefined' === PlatformStream[curConstructor]
-      || stream instanceof PlatformStream[curConstructor]
-    )) {
-      return false;
-    }
-  }
-  return true; // Defaults to true since checking isn't possible with 0.8
-}
 
 // Inherit of PassThrough stream
 util.inherits(StreamQueue, Stream.PassThrough);
@@ -42,7 +24,7 @@ function StreamQueue(options) {
   // Options
   this._pauseFlowingStream = true;
   this._resumeFlowingStream = true;
-  if(!(streamInstanceOf(options) || 'function' === typeof options)) {
+  if(!(isStream(options) || 'function' === typeof options)) {
     if('boolean' == typeof options.pauseFlowingStream) {
       this._pauseFlowingStream = options.pauseFlowingStream;
       delete options.pauseFlowingStream;
@@ -55,7 +37,7 @@ function StreamQueue(options) {
 
   // Parent constructor
   Stream.PassThrough.call(this,
-    streamInstanceOf(options)  || 'function' === typeof options
+    isStream(options)  || 'function' === typeof options
       ? undefined
       : options
   );
@@ -67,11 +49,11 @@ function StreamQueue(options) {
   this._objectMode = options.objectMode || false;
 
   // Queue given streams and ends
-  if(arguments.length > 1 || streamInstanceOf(options)
+  if(arguments.length > 1 || isStream(options)
     || 'function' === typeof options) {
     this.done.apply(this,
       [].slice.call(arguments,
-        streamInstanceOf(options) || 'function' === typeof options ? 0 : 1));
+        isStream(options) || 'function' === typeof options ? 0 : 1));
   }
 
 }
