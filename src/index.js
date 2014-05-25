@@ -110,7 +110,6 @@ StreamQueue.prototype.queue = function() {
   this._streams = this._streams.length ? this._streams.concat(streams) : streams;
 
   if(!this._running) {
-    this._running = true;
     this._pipeNextStream();
   }
 
@@ -120,6 +119,7 @@ StreamQueue.prototype.queue = function() {
 
 // Pipe the next available stream
 StreamQueue.prototype._pipeNextStream = function() {
+  var stream;
   if(!this._streams.length) {
     if(this._ending) {
       this.end();
@@ -128,7 +128,8 @@ StreamQueue.prototype._pipeNextStream = function() {
     }
     return;
   }
-  var stream = this._streams.shift();
+  this._running = true;
+  stream = this._streams.shift();
   if('function' === typeof stream) {
     stream = stream();
   }

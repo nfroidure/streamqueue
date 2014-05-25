@@ -149,6 +149,122 @@ describe('StreamQueue', function() {
         }, 100);
       });
 
+      it('should work with POO API and no stream plus sync done', function(done) {
+        var queue = new StreamQueue();
+        assert.equal(queue.length, 0);
+        queue.queue();
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        queue.done();
+      });
+
+      it('should work with POO API and no stream plus async done', function(done) {
+        var queue = new StreamQueue();
+        assert.equal(queue.length, 0);
+        queue.queue();
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        setTimeout(function() {
+          queue.done();
+        }, 100);
+      });
+
+      it('should work with POO API and a streamqueue stream plus async done', function(done) {
+        var queue = new StreamQueue();
+        var child = new StreamQueue();
+        queue.queue(child);
+        assert.equal(queue.length, 1);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        child.done();
+        setTimeout(function() {
+          queue.done();
+        }, 100);
+      });
+
+      it('should work with POO API and a streamqueue stream plus async done', function(done) {
+        var queue = new StreamQueue();
+        var child = new StreamQueue();
+        queue.queue(child);
+        assert.equal(queue.length, 1);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        child.done();
+        queue.done();
+      });
+
+      it('should work with POO API and a streamqueue ended stream plus async done', function(done) {
+        var queue = new StreamQueue();
+        var child = new StreamQueue();
+        queue.queue(child);
+        child.done();
+        assert.equal(queue.length, 1);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        setTimeout(function() {
+          queue.done();
+        }, 100);
+      });
+
+      it('should work with POO API and a streamqueue ended stream plus sync done', function(done) {
+        var queue = new StreamQueue();
+        var child = new StreamQueue();
+        queue.queue(child);
+        child.done();
+        assert.equal(queue.length, 1);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        queue.done();
+      });
+
+      it('should work with POO API and a streamqueue ended stream plus async done', function(done) {
+        var queue = new StreamQueue();
+        var child = new StreamQueue();
+        child.done();
+        queue.queue(child);
+        assert.equal(queue.length, 1);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        setTimeout(function() {
+          queue.done();
+        }, 100);
+      });
+
+      it('should work with POO API and a streamqueue ended stream plus sync done', function(done) {
+        var queue = new StreamQueue();
+        var child = new StreamQueue();
+        child.done();
+        queue.queue(child);
+        assert.equal(queue.length, 1);
+        queue.pipe(es.wait(function(err, data) {
+          assert.equal(err, null);
+          assert.equal(data, '');
+          done();
+        }));
+        queue.done();
+      });
+
       it('should reemit errors', function(done) {
         var gotError = false;
         var queue = new StreamQueue();
