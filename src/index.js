@@ -125,6 +125,7 @@ StreamQueue.prototype._pipeNextStream = function() {
 
 // Queue each stream given in argument
 StreamQueue.prototype.done = function() {
+  var _self = this;
   if(this._ending) {
     throw new Error('The queue is already ending.');
   }
