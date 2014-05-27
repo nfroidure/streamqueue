@@ -17,6 +17,20 @@ function StreamQueue(options) {
       [StreamQueue].concat([].slice.call(arguments,0))));
   }
 
+  // Options
+  this._pauseFlowingStream = true;
+  this._resumeFlowingStream = true;
+  if(!(isStream(options) || 'function' === typeof options)) {
+    if('boolean' == typeof options.pauseFlowingStream) {
+      this._pauseFlowingStream = options.pauseFlowingStream;
+      delete options.pauseFlowingStream;
+    }
+    if('boolean' == typeof options.resumeFlowingStream) {
+      this._resumeFlowingStream = options.resumeFlowingStream;
+      delete options.resumeFlowingStream;
+    }
+  }
+
   // Parent constructor
   Stream.PassThrough.call(this,
     isStream(options)  || 'function' === typeof options
@@ -54,6 +68,16 @@ StreamQueue.prototype.queue = function() {
       stream.on('error', function(err) {
         _self.emit('error', err);
       });
+      if('undefined' == typeof stream._readableState) {
+        stream = (new Stream.Readable({objectMode: _self._objectMode}))
+          .wrap(stream);
+      }
+      if(this._pauseFlowingStream&&stream._readableState.flowing) {
+        stream.pause();
+      }
+      if(this._resumeFlowingStream&&stream._readableState.flowing) {
+        stream.resume();
+      }
       return stream;
     }
     if('function' === typeof stream) {

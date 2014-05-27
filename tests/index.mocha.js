@@ -9,51 +9,6 @@ var assert = require('assert')
 [PlatformStream, Stream].slice(PlatformStream.Readable ? 0 : 1)
   .forEach(function(Stream) {
 
-// Helpers
-function writeToStreamSync(stream, chunks) {
-  if(!chunks.length) {
-    stream.end();
-  } else {
-    stream.write(chunks.shift());
-    writeToStreamSync(stream, chunks);
-  }
-  return stream;
-}
-function writeToStream(stream, chunks) {
-  if(!chunks.length) {
-    stream.end();
-  } else {
-    setTimeout(function() {
-      stream.write(chunks.shift());
-      writeToStream(stream, chunks);
-    });
-  }
-  return stream;
-}
-function readableStream(chunks) {
-  var stream = new Stream.Readable();
-  stream._read = function() {
-    if(chunks.length) {
-      setTimeout(function() {
-        stream.push(chunks.shift());
-        if(!chunks.length) {
-          stream.push(null);
-        }
-      });
-    }
-  }
-  stream.resume();
-  return stream;
-}
-function erroredStream(msg) {
-  var erroredStream = new Stream.PassThrough();
-  setTimeout(function() {
-    erroredStream.emit('error', new Error(msg));
-    erroredStream.end();
-  });
-  return erroredStream;
-}
-
 // Tests
 describe('StreamQueue', function() {
 
@@ -592,3 +547,80 @@ describe('StreamQueue', function() {
 });
 
 });
+
+describe('streamqueue with old 0.8 streams', function() {
+
+    it('should work', function(done) {
+      var queue = new StreamQueue();
+      queue.queue(writeToStreamOld(new PlatformStream(), ['wa','dup'], 50));
+      queue.queue(writeToStreamOld(new PlatformStream(), ['pl','op']));
+      queue.queue(writeToStreamOld(new PlatformStream(), ['ki','koo','lol']));
+      queue.pipe(es.wait(function(err, data) {
+        assert.equal(err, null);
+        assert.deepEqual(data, 'wadupplopkikoolol');
+        done();
+      }));
+      queue.done();
+    });
+  
+});
+
+// Helpers
+
+
+// Helpers
+function writeToStreamSync(stream, chunks) {
+  if(!chunks.length) {
+    stream.end();
+  } else {
+    stream.write(chunks.shift());
+    writeToStreamSync(stream, chunks);
+  }
+  return stream;
+}
+function writeToStream(stream, chunks) {
+  if(!chunks.length) {
+    stream.end();
+  } else {
+    setTimeout(function() {
+      stream.write(chunks.shift());
+      writeToStream(stream, chunks);
+    });
+  }
+  return stream;
+}
+function writeToStreamOld(stream, chunks, timeout) {
+  stream.readable = true;
+  if(!chunks.length) {
+    stream.emit('end');
+  } else {
+    setTimeout(function() {
+      stream.emit('data', chunks.shift());
+      writeToStreamOld(stream, chunks, timeout);
+    }, timeout || 0);
+  }
+  return stream;
+}
+function readableStream(chunks) {
+  var stream = new Stream.Readable();
+  stream._read = function() {
+    if(chunks.length) {
+      setTimeout(function() {
+        stream.push(chunks.shift());
+        if(!chunks.length) {
+          stream.push(null);
+        }
+      });
+    }
+  }
+  stream.resume();
+  return stream;
+}
+function erroredStream(msg) {
+  var erroredStream = new Stream.PassThrough();
+  setTimeout(function() {
+    erroredStream.emit('error', new Error(msg));
+    erroredStream.end();
+  });
+  return erroredStream;
+}
