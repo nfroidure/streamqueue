@@ -17,17 +17,28 @@ function StreamQueue(options) {
       [StreamQueue].concat([].slice.call(arguments,0))));
   }
 
+  // Set queue state object
+  this._queueState = {
+    _pauseFlowingStream: true,
+    _resumeFlowingStream: true,
+    _objectMode: false,
+    _streams: [],
+    _running: false,
+    _ending: false
+  };
+
   // Options
-  this._pauseFlowingStream = true;
-  this._resumeFlowingStream = true;
   if(!(isStream(options) || 'function' === typeof options)) {
     if('boolean' == typeof options.pauseFlowingStream) {
-      this._pauseFlowingStream = options.pauseFlowingStream;
+      this._queueState._pauseFlowingStream = options.pauseFlowingStream;
       delete options.pauseFlowingStream;
     }
     if('boolean' == typeof options.resumeFlowingStream) {
-      this._resumeFlowingStream = options.resumeFlowingStream;
+      this._queueState._resumeFlowingStream = options.resumeFlowingStream;
       delete options.resumeFlowingStream;
+    }
+    if('boolean' == typeof options.objectMode) {
+      this._queueState._objectMode = options.objectMode;
     }
   }
 
@@ -37,12 +48,6 @@ function StreamQueue(options) {
       ? undefined
       : options
   );
-
-  // Prepare streams queue
-  this._streams = [];
-  this._running = false;
-  this._ending = false;
-  this._objectMode = options.objectMode || false;
 
   // Queue given streams and ends
   if(arguments.length > 1 || isStream(options)
@@ -59,7 +64,7 @@ StreamQueue.prototype.queue = function() {
   var streams = [].slice.call(arguments, 0)
     , _self = this;
 
-  if(this._ending) {
+  if(this._queueState._ending) {
     throw new Error('Cannot add more streams to the queue.');
   }
 
@@ -69,13 +74,13 @@ StreamQueue.prototype.queue = function() {
         _self.emit('error', err);
       });
       if('undefined' == typeof stream._readableState) {
-        stream = (new Stream.Readable({objectMode: _self._objectMode}))
+        stream = (new Stream.Readable({objectMode: _self._queueState._objectMode}))
           .wrap(stream);
       }
-      if(this._pauseFlowingStream&&stream._readableState.flowing) {
+      if(_self._queueState._pauseFlowingStream&&stream._readableState.flowing) {
         stream.pause();
       }
-      if(this._resumeFlowingStream&&stream._readableState.flowing) {
+      if(_self._queueState._resumeFlowingStream&&stream._readableState.flowing) {
         stream.resume();
       }
       return stream;
@@ -88,9 +93,10 @@ StreamQueue.prototype.queue = function() {
     return wrapper(stream);
   });
 
-  this._streams = this._streams.length ? this._streams.concat(streams) : streams;
+  this._queueState._streams = this._queueState._streams.length ?
+    this._queueState._streams.concat(streams) : streams;
 
-  if(!this._running) {
+  if(!this._queueState._running) {
     this._pipeNextStream();
   }
 
@@ -101,42 +107,43 @@ StreamQueue.prototype.queue = function() {
 // Pipe the next available stream
 StreamQueue.prototype._pipeNextStream = function() {
   var stream;
-  if(!this._streams.length) {
-    if(this._ending) {
-      process.nextTick(function() {
-        this.end();
-      }.bind(this));
+  var _self = this;
+  if(!this._queueState._streams.length) {
+    if(this._queueState._ending) {
+      setImmediate(function() {
+        _self.end();
+      });
     } else {
-      this._running = false;
+      this._queueState._running = false;
     }
     return;
   }
-  this._running = true;
-  stream = this._streams.shift();
+  this._queueState._running = true;
+  stream = this._queueState._streams.shift();
   if('function' === typeof stream) {
     stream = stream();
   }
   stream.once('end', function() {
-    this.unpipe(stream);
-    this._pipeNextStream();
-  }.bind(this));
+    _self.unpipe(stream);
+    _self._pipeNextStream();
+  });
   stream.pipe(this, {end: false});
 };
 
 // Queue each stream given in argument
 StreamQueue.prototype.done = function() {
   var _self = this;
-  if(this._ending) {
-    throw new Error('The queue is already ending.');
+  if(this._queueState._ending) {
+    throw new Error('streamqueue: The queue is already ending.');
   }
   if(arguments.length) {
     this.queue.apply(this, arguments);
   }
-  this._ending = true;
-  if(!this._running) {
-    process.nextTick(function() {
-      this.end();
-    }.bind(this));
+  this._queueState._ending = true;
+  if(!this._queueState._running) {
+    setImmediate(function() {
+      _self.end();
+    });
   }
   return this;
 };
@@ -144,7 +151,7 @@ StreamQueue.prototype.done = function() {
 // Length
 Object.defineProperty(StreamQueue.prototype, 'length', {
   get: function() {
-    return this._streams.length + (this._running ? 1 : 0);
+    return this._queueState._streams.length + (this._queueState._running ? 1 : 0);
   }
 });
 

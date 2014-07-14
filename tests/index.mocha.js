@@ -17,27 +17,25 @@ describe('StreamQueue', function() {
     describe('and with async streams', function() {
 
       it('should work with functionnal API', function(done) {
-        StreamQueue(
+        getStreamText(StreamQueue(
           writeToStream(new Stream.PassThrough(), ['wa','dup']),
           writeToStream(new Stream.PassThrough(), ['pl','op']),
           writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
-        ).pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        ), function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
       });
 
       it('should work with functionnal API and options', function(done) {
-        StreamQueue({pause: true},
+        getStreamText(StreamQueue({pause: true},
           writeToStream(new Stream.PassThrough(), ['wa','dup']),
           writeToStream(new Stream.PassThrough(), ['pl','op']),
           writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
-        ).pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        ), function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
       });
 
       it('should work with POO API', function(done) {
@@ -46,11 +44,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -63,11 +60,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -80,11 +76,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -94,11 +89,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         setTimeout(function() {
           queue.done();
         }, 100);
@@ -108,11 +102,10 @@ describe('StreamQueue', function() {
         var queue = new StreamQueue();
         assert.equal(queue.length, 0);
         queue.queue();
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -120,11 +113,10 @@ describe('StreamQueue', function() {
         var queue = new StreamQueue();
         assert.equal(queue.length, 0);
         queue.queue();
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         setTimeout(function() {
           queue.done();
         }, 100);
@@ -135,11 +127,10 @@ describe('StreamQueue', function() {
         var child = new StreamQueue();
         queue.queue(child);
         assert.equal(queue.length, 1);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         child.done();
         setTimeout(function() {
           queue.done();
@@ -151,11 +142,10 @@ describe('StreamQueue', function() {
         var child = new StreamQueue();
         queue.queue(child);
         assert.equal(queue.length, 1);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         child.done();
         queue.done();
       });
@@ -166,11 +156,10 @@ describe('StreamQueue', function() {
         queue.queue(child);
         child.done();
         assert.equal(queue.length, 1);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         setTimeout(function() {
           queue.done();
         }, 100);
@@ -192,11 +181,10 @@ describe('StreamQueue', function() {
             assert.equal(ended, false);
           }));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.on('end', function() {
           ended = true;
         });
@@ -208,11 +196,10 @@ describe('StreamQueue', function() {
         var queue = new StreamQueue();
         var ended = false;
         assert.equal(queue.length, 0);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         queue.on('end', function() {
           ended = true;
         });
@@ -226,11 +213,10 @@ describe('StreamQueue', function() {
         queue.queue(child);
         child.done();
         assert.equal(queue.length, 1);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -240,11 +226,10 @@ describe('StreamQueue', function() {
         child.done();
         queue.queue(child);
         assert.equal(queue.length, 1);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         setTimeout(function() {
           queue.done();
         }, 100);
@@ -256,11 +241,10 @@ describe('StreamQueue', function() {
         child.done();
         queue.queue(child);
         assert.equal(queue.length, 1);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, '');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -273,14 +257,26 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 4);
         queue.on('error', function(err) {
-          gotError = true;
-        });
-        queue.pipe(es.wait(function(err, data) {
-          assert(gotError);
-          assert.equal(err, null);
-          assert.equal(data, 'wadupplopkikoolol');
+          assert.equal(err.message, 'Aouch!')
           done();
-        }));
+        });
+        getStreamText(queue, function(data) {});
+        queue.done();
+      });
+
+      it('should reemit errors elsewhere', function(done) {
+        var gotError = false;
+        var queue = new StreamQueue();
+        queue.queue(writeToStream(new Stream.PassThrough(), ['wa','dup']));
+        queue.queue(writeToStream(new Stream.PassThrough(), ['pl','op']));
+        queue.queue(erroredStream('Aouch!'));
+        queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
+        assert.equal(queue.length, 4);
+        queue.on('error', function(err) {
+          assert.equal(err.message, 'Aouch!')
+          done();
+        });
+        getStreamText(queue, function(data) {});
         queue.done();
       });
 
@@ -289,15 +285,14 @@ describe('StreamQueue', function() {
     describe('and with sync streams', function() {
 
       it('should work with functionnal API', function(done) {
-        StreamQueue(
+        getStreamText(StreamQueue(
           writeToStreamSync(new Stream.PassThrough(), ['wa','dup']),
           writeToStreamSync(new Stream.PassThrough(), ['pl','op']),
           writeToStreamSync(new Stream.PassThrough(), ['ki','koo','lol'])
-        ).pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        ), function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
       });
 
       it('should work with POO API', function(done) {
@@ -306,11 +301,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStreamSync(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStreamSync(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -320,11 +314,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStreamSync(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStreamSync(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
         assert.throws(function() {
           queue.done();
@@ -337,11 +330,10 @@ describe('StreamQueue', function() {
         queue.queue(writeToStreamSync(new Stream.PassThrough(), ['pl','op']));
         queue.queue(writeToStreamSync(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
         assert.throws(function() {
           queue.queue(new Stream.PassThrough());
@@ -360,12 +352,11 @@ describe('StreamQueue', function() {
           gotError = true;
           assert.equal(err.message, 'Aouch!');
         });
-        queue.pipe(es.wait(function(err, data) {
+        getStreamText(queue, function(data) {
           assert(gotError);
-          assert.equal(err, null);
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -374,17 +365,16 @@ describe('StreamQueue', function() {
     describe('and with functions returning streams', function() {
 
       it('should work with functionnal API', function(done) {
-        StreamQueue(function() {
+        getStreamText(StreamQueue(function() {
           return writeToStream(new Stream.PassThrough(), ['wa','dup']);
         }, function() {
           return writeToStream(new Stream.PassThrough(), ['pl','op']);
         }, function() {
           return writeToStream(new Stream.PassThrough(), ['ki','koo','lol']);
-        }).pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        }), function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
       });
 
       it('should work with functionnal API and options', function(done) {
@@ -392,19 +382,17 @@ describe('StreamQueue', function() {
           , stream2 = new Stream.PassThrough()
           , stream3 = new Stream.PassThrough()
         ;
-        StreamQueue({pause: true},
+        getStreamText(StreamQueue({pause: true},
           function() {
             return writeToStream(new Stream.PassThrough(), ['wa','dup']);
           }, function() {
             return writeToStream(new Stream.PassThrough(), ['pl','op']);
           }, function() {
             return writeToStream(new Stream.PassThrough(), ['ki','koo','lol']);
-          })
-          .pipe(es.wait(function(err, data) {
-            assert.equal(err, null);
+          }), function(data) {
             assert.equal(data, 'wadupplopkikoolol');
             done();
-          }));
+        });
       });
 
       it('should work with POO API', function(done) {
@@ -419,11 +407,10 @@ describe('StreamQueue', function() {
           return writeToStream(new Stream.PassThrough(), ['ki','koo','lol']);
         });
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -442,11 +429,10 @@ describe('StreamQueue', function() {
           return writeToStream(new Stream.PassThrough(), ['ki','koo','lol']);
         });
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -465,11 +451,10 @@ describe('StreamQueue', function() {
           return writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
         });
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -485,11 +470,10 @@ describe('StreamQueue', function() {
           return writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
         });
         assert.equal(queue.length, 3);
-        queue.pipe(es.wait(function(err, data) {
-          assert.equal(err, null);
+        getStreamText(queue, function(data) {
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         setTimeout(function() {
           queue.done();
         }, 100);
@@ -512,12 +496,11 @@ describe('StreamQueue', function() {
         queue.on('error', function(err) {
           gotError = true;
         });
-        queue.pipe(es.wait(function(err, data) {
+        getStreamText(queue, function(data) {
           assert(gotError);
-          assert.equal(err, null);
           assert.equal(data, 'wadupplopkikoolol');
           done();
-        }));
+        });
         queue.done();
       });
 
@@ -527,18 +510,15 @@ describe('StreamQueue', function() {
 
   describe('in object mode', function() {
 
-    var objs = [];
     it('should work', function(done) {
       var queue = new StreamQueue({objectMode: true});
       queue.queue(writeToStream(new Stream.PassThrough({objectMode: true}), [{s:'wa'},{s:'dup'}]));
       queue.queue(writeToStream(new Stream.PassThrough({objectMode: true}), [{s:'pl'},{s:'op'}]));
       queue.queue(writeToStream(new Stream.PassThrough({objectMode: true}), [{s:'ki'},{s:'koo'},{s:'lol'}]));
-      queue.on('data', objs.push.bind(objs));
-      queue.pipe(es.wait(function(err, data) {
-        assert.equal(err, null);
-        assert.deepEqual(objs, [{s:'wa'},{s:'dup'},{s:'pl'},{s:'op'},{s:'ki'},{s:'koo'},{s:'lol'}]);
+      getStreamObjs(queue, function(data) {
+        assert.deepEqual(data, [{s:'wa'},{s:'dup'},{s:'pl'},{s:'op'},{s:'ki'},{s:'koo'},{s:'lol'}]);
         done();
-      }));
+      });
       queue.done();
     });
 
@@ -555,18 +535,14 @@ describe('streamqueue with old 0.8 streams', function() {
       queue.queue(writeToStreamOld(new PlatformStream(), ['wa','dup'], 50));
       queue.queue(writeToStreamOld(new PlatformStream(), ['pl','op']));
       queue.queue(writeToStreamOld(new PlatformStream(), ['ki','koo','lol']));
-      queue.pipe(es.wait(function(err, data) {
-        assert.equal(err, null);
+      getStreamText(queue, function(data) {
         assert.deepEqual(data, 'wadupplopkikoolol');
         done();
-      }));
+      });
       queue.done();
     });
   
 });
-
-// Helpers
-
 
 // Helpers
 function writeToStreamSync(stream, chunks) {
@@ -624,3 +600,36 @@ function erroredStream(msg) {
   });
   return erroredStream;
 }
+
+function getStreamText(stream, cb) {
+  var text = '';
+  stream.on('readable', function () {
+    var chunk;
+    do {
+      chunk = stream.read();
+      if(chunk !== null) {
+        text += chunk.toString();
+      }
+    } while(chunk !== null);
+  });
+  stream.on('end', function () {
+    cb(text);
+  });
+}
+
+function getStreamObjs(stream, cb) {
+  var objs = [];
+  stream.on('readable', function () {
+    var obj;
+    do {
+      obj = stream.read();
+      if(obj !== null) {
+        objs.push(obj);
+      }
+    } while(obj !== null);
+  });
+  stream.on('end', function () {
+    cb(objs);
+  });
+}
+
