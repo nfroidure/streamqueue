@@ -110,7 +110,7 @@ StreamQueue.prototype._pipeNextStream = function() {
   var _self = this;
   if(!this._queueState._streams.length) {
     if(this._queueState._ending) {
-      setImmediate(function() {
+      process.nextTick(function() {
         _self.end();
       });
     } else {
@@ -141,7 +141,7 @@ StreamQueue.prototype.done = function() {
   }
   this._queueState._ending = true;
   if(!this._queueState._running) {
-    setImmediate(function() {
+    process.nextTick(function() {
       _self.end();
     });
   }
