@@ -257,10 +257,13 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 4);
         queue.on('error', function(err) {
-          assert.equal(err.message, 'Aouch!')
+          gotError = true;
+        });
+        getStreamText(queue, function(data) {
+          assert(gotError);
+          assert.equal(data, 'wadupplopkikoolol');
           done();
         });
-        getStreamText(queue, function(data) {});
         queue.done();
       });
 
@@ -273,10 +276,13 @@ describe('StreamQueue', function() {
         queue.queue(writeToStream(new Stream.PassThrough(), ['ki','koo','lol']));
         assert.equal(queue.length, 4);
         queue.on('error', function(err) {
-          assert.equal(err.message, 'Aouch!')
+          gotError = true;
+        });
+        getStreamText(queue, function(data) {
+          assert(gotError);
+          assert.equal(data, 'wadupplopkikoolol');
           done();
         });
-        getStreamText(queue, function(data) {});
         queue.done();
       });
 
@@ -495,6 +501,33 @@ describe('StreamQueue', function() {
         assert.equal(queue.length, 4);
         queue.on('error', function(err) {
           gotError = true;
+          assert.equal(err.message, 'Aouch!');
+        });
+        getStreamText(queue, function(data) {
+          assert(gotError);
+          assert.equal(data, 'wadupplopkikoolol');
+          done();
+        });
+        queue.done();
+      });
+
+      it('should reemit errors elsewhere', function(done) {
+        var gotError = false;
+        var queue = new StreamQueue();
+        queue.queue(function() {
+          return writeToStream(new Stream.PassThrough(), ['wa','dup']);
+        });
+        queue.queue(function() {
+          return writeToStream(new Stream.PassThrough(), ['pl','op'])
+        });
+        queue.queue(erroredStream('Aouch!'));
+        queue.queue(function() {
+          return writeToStream(new Stream.PassThrough(), ['ki','koo','lol'])
+        });
+        assert.equal(queue.length, 4);
+        queue.on('error', function(err) {
+          gotError = true;
+          assert.equal(err.message, 'Aouch!');
         });
         getStreamText(queue, function(data) {
           assert(gotError);
@@ -580,14 +613,13 @@ function writeToStreamOld(stream, chunks, timeout) {
 function readableStream(chunks) {
   var stream = new Stream.Readable();
   stream._read = function() {
+    var chunk = null;
     if(chunks.length) {
-      setTimeout(function() {
-        stream.push(chunks.shift());
-        if(!chunks.length) {
-          stream.push(null);
-        }
-      });
+      chunk = chunks.shift();
     }
+    setTimeout(function() {
+      stream.push(chunk);
+    });
   }
   stream.resume();
   return stream;

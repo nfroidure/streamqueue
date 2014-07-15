@@ -3,11 +3,12 @@ var Stream = require('readable-stream')
   , util = require('util')
 ;
 
-// Inherit of PassThrough stream
-util.inherits(StreamQueue, Stream.PassThrough);
+// Inherit of Readable stream
+util.inherits(StreamQueue, Stream.Readable);
 
 // Constructor
 function StreamQueue(options) {
+  var _self = this;
 
   options = options || {};
 
@@ -24,7 +25,10 @@ function StreamQueue(options) {
     _objectMode: false,
     _streams: [],
     _running: false,
-    _ending: false
+    _ending: false,
+    _awaitDrain: null,
+    _internalStream: null,
+    _curStream: null
   };
 
   // Options
@@ -42,8 +46,23 @@ function StreamQueue(options) {
     }
   }
 
+  // Prepare the stream to pipe in
+  this._queueState._internalStream = new Stream.Writable(
+    isStream(options)  || 'function' === typeof options
+      ? undefined
+      : options
+  );
+  this._queueState._internalStream._write = function(chunk, encoding, cb) {
+    if(_self.push(chunk)) {
+      cb();
+      return true;
+    };
+    _self._queueState._awaitDrain = cb;
+    return false;
+  };
+
   // Parent constructor
-  Stream.PassThrough.call(this,
+  Stream.Readable.call(this,
     isStream(options)  || 'function' === typeof options
       ? undefined
       : options
@@ -77,11 +96,8 @@ StreamQueue.prototype.queue = function() {
         stream = (new Stream.Readable({objectMode: _self._queueState._objectMode}))
           .wrap(stream);
       }
-      if(_self._queueState._pauseFlowingStream&&stream._readableState.flowing) {
+      if(_self._queueState._pauseFlowingStream && stream._readableState.flowing) {
         stream.pause();
-      }
-      if(_self._queueState._resumeFlowingStream&&stream._readableState.flowing) {
-        stream.resume();
       }
       return stream;
     }
@@ -105,29 +121,38 @@ StreamQueue.prototype.queue = function() {
 };
 
 // Pipe the next available stream
+StreamQueue.prototype._read = function(size) {
+  if(this._queueState._awaitDrain) {
+    this._queueState._awaitDrain();
+    this._queueState._awaitDrain = null;
+    this._queueState._internalStream.emit('drain');
+  }
+};
+
+// Pipe the next available stream
 StreamQueue.prototype._pipeNextStream = function() {
-  var stream;
   var _self = this;
   if(!this._queueState._streams.length) {
     if(this._queueState._ending) {
-      process.nextTick(function() {
-        _self.end();
-      });
+      _self.push(null);
     } else {
       this._queueState._running = false;
     }
     return;
   }
   this._queueState._running = true;
-  stream = this._queueState._streams.shift();
-  if('function' === typeof stream) {
-    stream = stream();
+  if('function' === typeof this._queueState._streams[0]) {
+    this._queueState._curStream = this._queueState._streams.shift()();
+  } else {
+    this._queueState._curStream = this._queueState._streams.shift();
   }
-  stream.once('end', function() {
-    _self.unpipe(stream);
+  this._queueState._curStream.once('end', function() {
     _self._pipeNextStream();
   });
-  stream.pipe(this, {end: false});
+  if(_self._queueState._resumeFlowingStream&&this._queueState._curStream._readableState.flowing) {
+    this._queueState._curStream.resume();
+  }
+  this._queueState._curStream.pipe(this._queueState._internalStream, {end: false});
 };
 
 // Queue each stream given in argument
@@ -141,9 +166,7 @@ StreamQueue.prototype.done = function() {
   }
   this._queueState._ending = true;
   if(!this._queueState._running) {
-    process.nextTick(function() {
-      _self.end();
-    });
+    _self.push(null);
   }
   return this;
 };
