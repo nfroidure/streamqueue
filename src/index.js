@@ -14,7 +14,7 @@ function StreamQueue(options) {
   // Ensure new were used
   if(!(this instanceof StreamQueue)) {
     return new (StreamQueue.bind.apply(StreamQueue,
-      [StreamQueue].concat([].slice.call(arguments,0))));
+      [StreamQueue].concat([].slice.call(arguments, 0))));
   }
 
   // Set queue state object
@@ -177,5 +177,12 @@ Object.defineProperty(StreamQueue.prototype, 'length', {
   }
 });
 
-module.exports = StreamQueue;
+StreamQueue.obj = function streamQueueObj(options) {
+  var firstArgumentIsAStream = isStream(options);
+  var streams = [].slice.call(arguments, firstArgumentIsAStream ? 0 : 1);
+  options = firstArgumentIsAStream ? {} : options;
+  options.objectMode = true;
+  return StreamQueue.apply({}.undef, [options].concat(streams));
+};
 
+module.exports = StreamQueue;

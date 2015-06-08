@@ -109,6 +109,11 @@ Append streams given in argument to the queue.
 
 Append streams given in argument to the queue and ends when the queue is empty.
 
+
+### StreamQueue.obj([options], [stream1, stream2, ... streamN])
+
+A shortcut for `StreamQueue({objectMode: true})`.
+
 ## Stats
 
 [![NPM](https://nodei.co/npm/streamqueue.png?downloads=true&stars=true)](https://nodei.co/npm/streamqueue/)

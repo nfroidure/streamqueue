@@ -650,6 +650,39 @@ describe('StreamQueue', function() {
 
       });
 
+      describe('in object mode with the .obj() shortcut', function() {
+
+        it('should work without options', function(done) {
+          StreamQueue.obj(
+            StreamTest[version].fromObjects([{s:'wa'},{s:'dup'}]),
+            StreamTest[version].fromObjects([{s:'pl'},{s:'op'}]),
+            StreamTest[version].fromObjects([{s:'ki'},{s:'koo'},{s:'lol'}])
+          ).pipe(StreamTest[version].toObjects(function(err, objs) {
+            if(err) {
+              done(err);
+            }
+            assert.deepEqual(objs, [{s:'wa'},{s:'dup'},{s:'pl'},{s:'op'},{s:'ki'},{s:'koo'},{s:'lol'}]);
+            done();
+          }));
+        });
+
+        it('should work with options', function(done) {
+          StreamQueue.obj(
+            {},
+            StreamTest[version].fromObjects([{s:'wa'},{s:'dup'}]),
+            StreamTest[version].fromObjects([{s:'pl'},{s:'op'}]),
+            StreamTest[version].fromObjects([{s:'ki'},{s:'koo'},{s:'lol'}])
+          ).pipe(StreamTest[version].toObjects(function(err, objs) {
+            if(err) {
+              done(err);
+            }
+            assert.deepEqual(objs, [{s:'wa'},{s:'dup'},{s:'pl'},{s:'op'},{s:'ki'},{s:'koo'},{s:'lol'}]);
+            done();
+          }));
+        });
+
+      });
+
     });
 
   });
