@@ -1,7 +1,6 @@
-var Stream = require('readable-stream')
-  , isStream = require('isstream')
-  , util = require('util')
-;
+var Stream = require('readable-stream');
+var isStream = require('isstream');
+var util = require('util');
 
 // Inherit of Readable stream
 util.inherits(StreamQueue, Stream.Readable);
@@ -13,7 +12,7 @@ function StreamQueue(options) {
   options = options || {};
 
   // Ensure new were used
-  if (!(this instanceof StreamQueue)) {
+  if(!(this instanceof StreamQueue)) {
     return new (StreamQueue.bind.apply(StreamQueue,
       [StreamQueue].concat([].slice.call(arguments,0))));
   }
@@ -48,29 +47,29 @@ function StreamQueue(options) {
 
   // Prepare the stream to pipe in
   this._queueState._internalStream = new Stream.Writable(
-    isStream(options)  || 'function' === typeof options
-      ? undefined
-      : options
+    isStream(options)  || 'function' === typeof options ?
+      undefined :
+      options
   );
   this._queueState._internalStream._write = function(chunk, encoding, cb) {
     if(_self.push(chunk)) {
       cb();
       return true;
-    };
+    }
     _self._queueState._awaitDrain = cb;
     return false;
   };
 
   // Parent constructor
   Stream.Readable.call(this,
-    isStream(options)  || 'function' === typeof options
-      ? undefined
-      : options
+    isStream(options)  || 'function' === typeof options ?
+      undefined :
+      options
   );
 
   // Queue given streams and ends
-  if(arguments.length > 1 || isStream(options)
-    || 'function' === typeof options) {
+  if(arguments.length > 1 || isStream(options) ||
+    'function' === typeof options) {
     this.done.apply(this,
       [].slice.call(arguments,
         isStream(options) || 'function' === typeof options ? 0 : 1));
@@ -80,8 +79,8 @@ function StreamQueue(options) {
 
 // Queue each stream given in argument
 StreamQueue.prototype.queue = function() {
-  var streams = [].slice.call(arguments, 0)
-    , _self = this;
+  var streams = [].slice.call(arguments, 0);
+  var _self = this;
 
   if(this._queueState._ending) {
     throw new Error('Cannot add more streams to the queue.');

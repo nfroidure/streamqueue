@@ -3,11 +3,9 @@ var Stream = require('readable-stream');
 var StreamTest = require('streamtest');
 var StreamQueue = require('../src');
 
-
-
 // Tests
 describe('StreamQueue', function() {
-  
+
   // Iterating through versions
   StreamTest.versions.forEach(function(version) {
 
@@ -657,4 +655,3 @@ describe('StreamQueue', function() {
   });
 
 });
-
