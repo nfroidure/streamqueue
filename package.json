@@ -7,7 +7,9 @@
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha tests/*.mocha.js",
     "coveralls": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- tests/*.mocha.js -R spec -t 5000 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
-    "cover": "./node_modules/istanbul/lib/cli.js cover --report html ./node_modules/mocha/bin/_mocha -- tests/*.mocha.js -R spec -t 5000"
+    "cover": "./node_modules/istanbul/lib/cli.js cover --report html ./node_modules/mocha/bin/_mocha -- tests/*.mocha.js -R spec -t 5000",
+    "lint": "eslint **/*.js *.js",
+    "cli": "env NPM_RUN_CLI=1"
   },
   "repository": {
     "type": "git",
@@ -44,7 +46,7 @@
     "url": "https://github.com/nfroidure/StreamQueue/issues"
   },
   "dependencies": {
-    "readable-stream": "~1.0.33",
-    "isstream": "~0.1.2"
+    "isstream": "^0.1.2",
+    "readable-stream": "~1.0.33"
   }
 }

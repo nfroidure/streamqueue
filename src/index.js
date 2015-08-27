@@ -178,7 +178,7 @@ Object.defineProperty(StreamQueue.prototype, 'length', {
 });
 
 StreamQueue.obj = function streamQueueObj(options) {
-  var firstArgumentIsAStream = isStream(options);
+  var firstArgumentIsAStream = (!options) || isStream(options);
   var streams = [].slice.call(arguments, firstArgumentIsAStream ? 0 : 1);
   options = firstArgumentIsAStream ? {} : options;
   options.objectMode = true;
