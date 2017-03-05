@@ -67,7 +67,7 @@
   "dependencies": {
     "debug": "2.6.1",
     "isstream": "^0.1.2",
-    "readable-stream": "~1.0.33"
+    "readable-stream": "^2.2.3"
   },
   "license": "MIT",
   "config": {
