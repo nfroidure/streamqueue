@@ -1,3 +1,18 @@
+<a name="1.1.2"></a>
+## [1.1.2](https://github.com/nfroidure/StreamQueue/compare/v1.1.1...v1.1.2) (2017-12-03)
+
+
+### build
+
+* **metapak-nfroidure:** Add metapak-nfroidure ([a8a9572](https://github.com/nfroidure/StreamQueue/commit/a8a9572))
+
+
+### BREAKING CHANGES
+
+* **metapak-nfroidure:** Remove support for Node version prior to the last LTS
+
+
+
 ### v1.1.1 (2015/08/27 11:33 +00:00)
 - [a772c39](https://github.com/nfroidure/streamqueue/commit/a772c3925e60fd2f26b7a2f8e0aa500793df62bc) 1.1.1 (@nfroidure)
 - [a2443fd](https://github.com/nfroidure/streamqueue/commit/a2443fdd28ccab84892f08f3d55a7c8b304e4fb3) Fixing the .obj() shortcut with no args fix #9 (@nfroidure)

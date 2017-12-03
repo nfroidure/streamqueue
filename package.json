@@ -1,6 +1,6 @@
 {
   "name": "streamqueue",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "StreamQueue pipe the queued streams one by one in order to preserve their content order.",
   "homepage": "https://github.com/nfroidure/StreamQueue",
   "main": "src/index.js",
