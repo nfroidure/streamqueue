@@ -12,7 +12,7 @@
 
 [//]: # (::contents:start)
 
-## Usage
+## Usage
 
 Install the [npm module](https://npmjs.org/package/streamqueue):
 
