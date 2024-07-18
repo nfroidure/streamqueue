@@ -1,3 +1,23 @@
+# [2.0.0](https://github.com/nfroidure/StreamQueue/compare/v1.1.2...v2.0.0) (2024-07-18)
+
+
+### Bug Fixes
+
+* **docs:** fix markdown title ([984bdee](https://github.com/nfroidure/StreamQueue/commit/984bdee4581509d80df369f810ebbf5c73ec0a42))
+
+
+### Code Refactoring
+
+* **core:** complete refactoring ([a969877](https://github.com/nfroidure/StreamQueue/commit/a969877e4cf877a13d57b90c779342c47be7cbfc))
+
+
+### BREAKING CHANGES
+
+* **core:** Support only Node20+, use ESM, API surface changed. By updating assume you could
+have a lot of work to do.
+
+
+
 <a name="1.1.2"></a>
 ## [1.1.2](https://github.com/nfroidure/StreamQueue/compare/v1.1.1...v1.1.2) (2017-12-03)
 
