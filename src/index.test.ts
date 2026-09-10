@@ -62,6 +62,28 @@ describe('StreamQueue', () => {
         expect(await result).toEqual('wadupplopkikoolol');
       });
 
+      test('should wait for reads before draining internal writes', () => {
+        const queue = new StreamQueue();
+        const { _internalStream } = queue as unknown as {
+          _internalStream: {
+            write: (chunk: Buffer, cb: () => void) => boolean;
+          };
+        };
+        const chunk = Buffer.alloc(1024 * 1024);
+        let callbackCalled = false;
+
+        const canWriteMore = _internalStream.write(chunk, () => {
+          callbackCalled = true;
+        });
+
+        expect(canWriteMore).toEqual(false);
+        expect(callbackCalled).toEqual(false);
+
+        queue._read();
+
+        expect(callbackCalled).toEqual(true);
+      });
+
       test('should pause streams in flowing mode', async () => {
         const [stream, result] = StreamTest.toText();
         const queue = new StreamQueue({
